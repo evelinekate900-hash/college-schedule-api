@@ -1,0 +1,32 @@
+name: Обновление расписания
+
+on:
+  schedule:
+    - cron: '0 */4 * * *' # Скрипт будет запускаться каждые 4 часа
+  workflow_dispatch: # Позволяет запускать обновление вручную с кнопки
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Установка Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Установка библиотек
+        run: pip install pandas requests openpyxl
+
+      - name: Запуск парсера
+        run: python parser.py
+
+      - name: Сохранение результата в репозиторий
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add schedule.json
+          git commit -m "Автообновление расписания" || exit 0
+          git push
+          
